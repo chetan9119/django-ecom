@@ -10,7 +10,6 @@ class Cart(models.Model):
         return self.cart_id
 
 class CartItem(models.Model):
-    
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart,on_delete=models.CASCADE)
     quantity = models.IntegerField()

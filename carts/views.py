@@ -35,7 +35,6 @@ def add_cart(request, product_id):
     # close()
     return redirect('cart')
 
-
 def remove_cart(request, product_id):
     cart = Cart.objects.get(cart_id=_cart_id(request))
     product = get_object_or_404(Product, id = product_id)
@@ -63,6 +62,8 @@ def remove_cart_item(request, product_id):
         
 def cart(request, total=0, quantity=0, cart_items=None):
     try:
+        tax = 0
+        grand_total = 0
         cart = Cart.objects.get(cart_id = _cart_id(request))
         cart_items = CartItem.objects.filter(cart=cart, is_active=True)
         
@@ -74,7 +75,7 @@ def cart(request, total=0, quantity=0, cart_items=None):
         grand_total = total + tax
     except ObjectDoesNotExist:
         pass
-    
+        
     context = {
         'total':total,
         'quantity':quantity,
