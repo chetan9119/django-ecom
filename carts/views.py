@@ -12,6 +12,9 @@ def _cart_id(request):
     return cart
 
 def add_cart(request, product_id):
+    color = request.GET.get('color')
+    size = request.GET.get('size')
+    
     product = Product.objects.get(id=product_id)
     try:
         cart = Cart.objects.get(cart_id=_cart_id(request))
@@ -85,5 +88,3 @@ def cart(request, total=0, quantity=0, cart_items=None):
     }
           
     return render(request, 'store/cart.html', context)
-
-
