@@ -38,7 +38,7 @@ def add_cart(request, product_id):
           
     if is_cart_item_exists:
 
-        cart_item = CartItem.objects.filter(product=product, quantity=1, cart=cart)
+        cart_item = CartItem.objects.filter(product=product, cart=cart)
         # existing variation -> database
         # current variation -> product_variation
         # item_id -> database
@@ -50,14 +50,14 @@ def add_cart(request, product_id):
         
         # check current variation inside the existing variation - increase quantity for cart_item
         for item in cart_item:
-            print(item)
+            # print(item)
             existing_variation = item.variation.all()
             ex_var_list.append(list(existing_variation)) # existing_variation into list
             id.append(item.id) # appending item id in list
         
-        print(ex_var_list)
+        # print(ex_var_list)
         # print(ex_var_list[1])
-        print(product_variation)
+        # print(product_variation)
         
         if product_variation in ex_var_list:
             # increase the cart item qunatity
@@ -70,7 +70,6 @@ def add_cart(request, product_id):
             item.save()
             
         else:
-            
             # item creation
             item = CartItem.objects.create(product=product, quantity=1, cart=cart)
             
@@ -78,15 +77,11 @@ def add_cart(request, product_id):
             if len(product_variation) > 0:
                 item.variation.clear()
                 item.variation.add(*product_variation)
-        
-        # cart_item.quantity += 1
+
+            # cart_item.quantity += 1
             item.save()
     else:
-        cart_item = CartItem.objects.create(
-            product = product, 
-            quantity = 1,
-            cart = cart,
-        )
+        cart_item = CartItem.objects.create(product = product, quantity = 1, cart = cart)
         if len(product_variation) > 0:
             cart_item.variation.clear()
             cart_item.variation.add(*product_variation)
@@ -95,24 +90,28 @@ def add_cart(request, product_id):
     # close()
     return redirect('cart')
 
-def remove_cart(request, product_id):
+def remove_cart(request, product_id, cart_item_id):
     cart = Cart.objects.get(cart_id=_cart_id(request))
     product = get_object_or_404(Product, id = product_id)
-    cart_item = CartItem.objects.get(product=product, cart=cart)
     
-    if cart_item.quantity > 1:
-        cart_item.quantity -= 1
-        cart_item.save()
-        
-    else:
-        cart_item.delete()
+    try:
+        cart_item = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+            
+        else:
+            cart_item.delete()
+            
+    except:
+        pass
         
     return redirect('cart')
 
-def remove_cart_item(request, product_id):
+def remove_cart_item(request, product_id, cart_item_id):
     cart = Cart.objects.get(cart_id=_cart_id(request))
     product = get_object_or_404(Product, id = product_id)
-    cart_item = CartItem.objects.get(product=product, cart=cart)
+    cart_item = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)
     cart_item.delete()
     return redirect('cart')
         
@@ -131,7 +130,7 @@ def cart(request, total=0, quantity=0, cart_items=None):
         grand_total = total + tax
     except ObjectDoesNotExist:
         pass
-        
+
     context = {
         'total':total,
         'quantity':quantity,
