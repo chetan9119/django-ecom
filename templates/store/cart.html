@@ -78,7 +78,7 @@
 	</td>
 	<td class="text-right"> 
 	<!-- alert on removing item of cart -->	
-	<a href="{% url 'remove_cart_item' cart_item.product.id cart_item.id %}" onclick="return confirm('Confirm Deletion')" class="btn btn-danger"> Remove</a>
+	<a href="{% url 'remove_cart_item' cart_item.product.id cart_item.id %}" onclick="return confirm('Click ok to remove cart item ')" class="btn btn-danger"> Remove</a>
 	</td>
 </tr>
 {% endfor %}
