@@ -4,8 +4,15 @@ from .models import *
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 
-def register(request):
-    
+# verification email
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import EmailMessage
+
+def register(request):  
     if request.method == "POST":
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -18,6 +25,21 @@ def register(request):
             user = Account.objects.create_user(first_name=first_name, last_name=last_name, email=email, username=username, password=password)
             user.phone_number = phone_number
             user.save()
+            
+            # User Activation
+            current_site = get_current_site(request)
+            mail_subject = 'Please activate your account'
+            message = render_to_string('accounts/account_verification.html', {
+                'user':user, # user object itself
+                'domain':current_site,
+                'uid':urlsafe_base64_encode(force_bytes(user.pk)), # to hide primary key of user
+                'token':default_token_generator.make_token(user),                
+            })
+            
+            to_email = email
+            send_email = EmailMessage(subject=mail_subject, body=message, to=[to_email])
+            send_email.send()
+            
             messages.success(request, 'Registration Successfull !')
             return redirect('register')
             
@@ -50,4 +72,8 @@ def logout(request):
     auth.logout(request)
     messages.success(request, 'Your are logged out.')
     return redirect('login')
+
+
+def activate(request):
+    return
 
