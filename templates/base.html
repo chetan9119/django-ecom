@@ -1,5 +1,4 @@
 {% load static %}
- 
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
@@ -7,29 +6,26 @@
 <meta http-equiv="pragma" content="no-cache" />
 <meta http-equiv="cache-control" content="max-age=604800" />
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
 <title>GreatKart | One of the Biggest Online Shopping Platform</title>
-
 <link href="{% static 'images/favicon.ico' %}" rel="shortcut icon" type="image/x-icon">
-
 <!-- jQuery -->
 <script src="{% static 'js/jquery-2.0.0.min.js' %}" type="text/javascript"></script>
-
 <!-- Bootstrap4 files-->
 <script src="{% static 'js/bootstrap.bundle.min.js' %}" type="text/javascript"></script>
 <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" type="text/css"/>
-
 <!-- Font awesome 5 -->
 <link href="{% static 'fonts/fontawesome/css/all.min.css' %}" type="text/css" rel="stylesheet">
-
 <!-- custom style -->
 <link href="{% static 'css/ui.css' %}" rel="stylesheet" type="text/css"/>
 <link href="{% static 'css/responsive.css' %}" rel="stylesheet" media="only screen and (max-width: 1200px)" />
-
 <!-- custom javascript -->
 <script src="{% static 'js/script.js' %}" type="text/javascript"></script>
 
+<!-- paypal intergration -->
+<script src="https://www.paypal.com/sdk/js?client-id=AdlMvsE7BCU7gc-iBaAtCebVyPicNgTxTtt_rg15jTsn-yq-6u4CoavDBzJjX8dik6DgyzhMG1W1t6QA&currency=USD"></script>
+
 <script type="text/javascript">
+
 /// some script
 
 // jquery ready start
@@ -41,14 +37,46 @@ $(document).ready(function() {
 </script>
 
 </head>
-<body>
+<script>
+    // RENDER PAYPAL BUTTON into #paypal-button-container
+paypal.Buttons({
+	
+	style: {
+		color: 'gold',
+		shape: 'rect',
+		label: 'paypal',
+		height: 40
+	},
 
+
+	createOrder: function(data, actions) {
+		// This function sets up the details of the transaction, including the amount and line item details.
+		return actions.order.create({
+			purchase_units: [{
+				amount: {
+					value: 88,
+				}
+			}]
+		});
+	},
+
+	// FINALISE TRANSACTION
+	onApprove: function(data, actions) {
+		// This function captures the funds from the transaction.
+		console.log(details)
+		return actions.order.capture().then(function(details) {
+			alert('Transaction completed by '+ details.payer.name.given_name + '!')
+				});
+
+	}
+	
+}).render('#paypal-button-container');
+</script>
+<body>
 <!-- navbar.html -->
 {% include 'includes/navbar.html' %}
 {% block content %}
-
 <!-- content(home.html) -->
-
 {% endblock %}
 {% include 'includes/footer.html' %}
 <!-- footer.html -->
