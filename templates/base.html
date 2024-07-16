@@ -22,7 +22,7 @@
 <script src="{% static 'js/script.js' %}" type="text/javascript"></script>
 
 <!-- paypal intergration -->
-<script src="https://www.paypal.com/sdk/js?client-id=AdlMvsE7BCU7gc-iBaAtCebVyPicNgTxTtt_rg15jTsn-yq-6u4CoavDBzJjX8dik6DgyzhMG1W1t6QA&currency=USD"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=Aa8TXCDHJxOhP525GqFuiDcyn5_6TRIfPKHyNlm2mfwt-EoMbRImCGmwz2T0Xk__YAdtgy6CtTZ9XmCl&currency=USD"></script>
 
 <script type="text/javascript">
 
@@ -37,41 +37,6 @@ $(document).ready(function() {
 </script>
 
 </head>
-<script>
-    // RENDER PAYPAL BUTTON into #paypal-button-container
-paypal.Buttons({
-	
-	style: {
-		color: 'gold',
-		shape: 'rect',
-		label: 'paypal',
-		height: 40
-	},
-
-
-	createOrder: function(data, actions) {
-		// This function sets up the details of the transaction, including the amount and line item details.
-		return actions.order.create({
-			purchase_units: [{
-				amount: {
-					value: 88,
-				}
-			}]
-		});
-	},
-
-	// FINALISE TRANSACTION
-	onApprove: function(data, actions) {
-		// This function captures the funds from the transaction.
-		console.log(details)
-		return actions.order.capture().then(function(details) {
-			alert('Transaction completed by '+ details.payer.name.given_name + '!')
-				});
-
-	}
-	
-}).render('#paypal-button-container');
-</script>
 <body>
 <!-- navbar.html -->
 {% include 'includes/navbar.html' %}
