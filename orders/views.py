@@ -4,6 +4,9 @@ from .forms import OrderForm
 import datetime
 from .models import *
 import json
+from django.http import JsonResponse
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 
 
 def payments(request):
@@ -23,7 +26,59 @@ def payments(request):
     order.payment = payment
     order.is_ordered = True
     order.save()
-    return render(request, 'orders/payment.html')
+    
+    
+    # Move the cart items to the Order Product table
+    cart_items = CartItem.objects.filter(user=request.user)
+    for item in cart_items:
+        order_product = OrderProduct()
+        order_product.order_id = order.id
+        order_product.payment = payment
+        order_product.user_id = request.user.id
+        order_product.product_id = item.product_id
+        order_product.quantity = item.quantity
+        order_product.product_price = item.product.price
+        order_product.ordered = True
+        # ManytoManyField needs to be saved first
+        order_product.save()
+
+        cart_item = CartItem.objects.get(id=item.id)
+        product_variation = cart_item.variations.all()
+        order_product = OrderProduct.objects.get(id=order_product.id)
+        order_product.variations.set(product_variation)
+        order_product.save()
+
+
+    # Decrement the quantity of the available stock
+
+    product = Product.objects.get(id=item.product_id)
+    product.stock -= item.quantity
+    product.save()
+
+    # CLEAR the cart 
+    
+    CartItem.objects.filter(user=request.user).delete()
+
+    # SEND order EMAIL to customer
+    
+    mail_subject = 'Thank you for your order!'
+    message = render_to_string('orders/order_received_email.html', {
+        'user': request.user,
+        'order': order,
+    })
+
+    to_email = request.user.email 
+    send_email = EmailMessage(mail_subject, message, to=[to_email])
+    send_email.send()
+
+    # SEND order number and transaction id to sendData method via JSON1
+
+    data = {
+        'order_number': order.order_number,
+        'transID': payment.payment_id,
+    }
+
+    return JsonResponse(data)
 
 
 def place_order(request, total=0, quantity=0):
@@ -78,8 +133,6 @@ def place_order(request, total=0, quantity=0):
                 'tax': tax,
                 'grand_total': grand_total,
             }
-            return render(request, 'orders/payments.html', context)
-            
-            
+            return render(request, 'orders/payments.html', context)        
     else:
         return redirect('checkout')

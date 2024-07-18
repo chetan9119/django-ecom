@@ -121,8 +121,11 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_FROM = 'chetan.parashar09@gmail.com'
 EMAIL_HOST_USER = 'chetan.parashar09@gmail.com'
-EMAIL_HOST_PASSWORD = 'chetan@1992'
+EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
 
 # Version upgrade for Django
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY='same-origin-allow-popups'
